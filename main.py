@@ -202,56 +202,12 @@ st.header("📹 Screen Recorder")
 # Embed custom HTML/JS for screen recording
 components.html("""
 <style>
-  #startBtn, #stopBtn {
-    font-size: 16px;
-    padding: 10px 20px;
-    margin: 10px 10px 10px 0;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-  }
-
-  #startBtn {
-    background-color: #4CAF50;
-    color: white;
-  }
-
-  #startBtn:hover {
-    background-color: #45a049;
-  }
-
-  #stopBtn {
-    background-color: #f44336;
-    color: white;
-  }
-
-  #stopBtn:hover {
-    background-color: #da190b;
-  }
-
-  #player {
-    width: 100%;
-    max-height: 300px;
-    border-radius: 12px;
-    margin-bottom: 10px;
-  }
-
-  a[download] {
-    display: inline-block;
-    margin-top: 15px;
-    background: #0066cc;
-    color: white;
-    padding: 10px 15px;
-    text-decoration: none;
-    border-radius: 6px;
-    font-weight: 600;
-  }
-
-  a[download]:hover {
-    background: #0055aa;
-  }
+  #startBtn, #stopBtn { padding:10px 20px; border:none; border-radius:8px; font-size:16px; cursor:pointer; margin-right:10px; }
+  #startBtn { background:#4CAF50; color:#fff; } #startBtn:hover{background:#45a049;}
+  #stopBtn  { background:#f44336; color:#fff; } #stopBtn:hover {background:#da190b;}
+  #player   { width:100%; max-height:300px; border-radius:12px; margin-bottom:10px; }
+  a[download]{ display:inline-block; margin-top:15px; padding:10px 15px; background:#0066cc; color:#fff; border-radius:6px;}
+  a[download]:hover{ background:#0055aa; }
 </style>
 
 <video id="player" controls></video><br/>
@@ -260,44 +216,45 @@ components.html("""
 
 <script>
   const startBtn = document.getElementById('startBtn');
-  const stopBtn = document.getElementById('stopBtn');
-  const player = document.getElementById('player');
-  let mediaRecorder;
-  let recordedChunks = [];
+  const stopBtn  = document.getElementById('stopBtn');
+  const player   = document.getElementById('player');
+  let mediaRecorder, recordedChunks = [];
 
   startBtn.onclick = async () => {
-    const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
-    player.srcObject = stream;
-    mediaRecorder = new MediaRecorder(stream);
-    recordedChunks = [];
+    // 1) Screen + system audio (where supported)
+    const displayStream = await navigator.mediaDevices.getDisplayMedia({ video:true, audio:true });
+    // 2) Microphone audio
+    const micStream     = await navigator.mediaDevices.getUserMedia({ audio:true });
+    // Combine
+    const combined = new MediaStream([
+      ...displayStream.getVideoTracks(),
+      ...displayStream.getAudioTracks(),
+      ...micStream.getAudioTracks()
+    ]);
 
-    mediaRecorder.ondataavailable = e => {
-      if (e.data.size > 0) recordedChunks.push(e.data);
-    };
+    player.srcObject = combined;
+    mediaRecorder   = new MediaRecorder(combined);
+    recordedChunks  = [];
 
+    mediaRecorder.ondataavailable = e => { if(e.data.size>0) recordedChunks.push(e.data); };
     mediaRecorder.onstop = () => {
-      const blob = new Blob(recordedChunks, { type: 'video/webm' });
-      const url = URL.createObjectURL(blob);
-      player.srcObject = null;
-      player.src = url;
-
-      const dl = document.createElement('a');
-      dl.href = url;
-      dl.download = 'recording.webm';
-      dl.textContent = '📥 Download Recording';
-      document.body.appendChild(dl);
+      const blob = new Blob(recordedChunks, { type:'video/webm' });
+      const url  = URL.createObjectURL(blob);
+      player.srcObject = null; player.src = url;
+      const a  = document.createElement('a');
+      a.href     = url; a.download ='recording.webm'; a.textContent='📥 Download Recording';
+      document.body.appendChild(a);
     };
 
     mediaRecorder.start();
     startBtn.disabled = true;
-    stopBtn.disabled = false;
+    stopBtn.disabled  = false;
   };
 
   stopBtn.onclick = () => {
     mediaRecorder.stop();
     startBtn.disabled = false;
-    stopBtn.disabled = true;
+    stopBtn.disabled  = true;
   };
 </script>
-""", height=420)
- 
+""", height=450)
