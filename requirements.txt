@@ -1,0 +1,7 @@
+nbformat
+streamlit
+docx
+PyPDF2
+python-docx
+pdf2docx
+pillow
