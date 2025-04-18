@@ -7,6 +7,7 @@ import tempfile
 from pdf2docx import Converter
 from PyPDF2 import PdfMerger
 import streamlit.components.v1 as components
+import moviepy.editor as mp
 
  
 
@@ -299,4 +300,38 @@ components.html("""
   };
 </script>
 """, height=420)
+
+
+# --- Fifth Row: WebM to MP4 Converter ---
+st.markdown("---")
+st.header("🎬 WebM to MP4 Converter")
+
+uploaded_webm = st.file_uploader(
+    "Upload a WebM video to convert to MP4",
+    type=["webm"],
+    key="webm_uploader"
+)
+
+if uploaded_webm:
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".webm") as tmp_webm:
+        tmp_webm.write(uploaded_webm.read())
+        webm_path = tmp_webm.name
+    try:
+        clip = mp.VideoFileClip(webm_path)
+        tmp_mp4 = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4")
+        mp4_path = tmp_mp4.name
+        clip.write_videofile(mp4_path, codec='libx264')
+        clip.close()
+        with open(mp4_path, "rb") as f:
+            mp4_bytes = f.read()
+        out_name_mp4 = os.path.splitext(uploaded_webm.name)[0] + ".mp4"
+        st.download_button(
+            label="📥 Download MP4",
+            data=mp4_bytes,
+            file_name=out_name_mp4,
+            mime="video/mp4"
+        )
+    except Exception as e:
+        st.error(f"❌ Conversion failed: {e}")
+
  
