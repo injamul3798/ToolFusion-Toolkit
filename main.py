@@ -107,7 +107,7 @@ with col3:
 
 # Right of Second Row: PDF to DOCX Converter (Layout-Preserving)
 with col4:
-    st.header("📄 PDF to DOCX Converter (Layout-Preserving)")
+    st.header("📄 PDF to DOCX Converter")
     uploaded_pdf = st.file_uploader(
         "Upload a PDF to convert to DOCX",
         type=["pdf"],
