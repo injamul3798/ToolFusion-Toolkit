@@ -1,5 +1,7 @@
 # ToolFusion: Convert, Resize, Record & PDFs
 
+[toolfusion.webm](https://github.com/user-attachments/assets/509a15d9-3dd7-4320-b942-849b3b1ad9cd)
+
 **ToolFusion** is a Streamlit web application that consolidates multiple utility tools into a single interface:
 
 - **Notebook → Script Converter**: Extract and download Python code from a Jupyter notebook (`.ipynb`).
