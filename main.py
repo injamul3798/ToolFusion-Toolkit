@@ -9,9 +9,6 @@ from PyPDF2 import PdfMerger
 import streamlit.components.v1 as components
 import moviepy.editor as mp
 
- 
-
- 
 st.set_page_config(page_title="ToolFusion: Convert, Resize, Record & PDFs", layout="wide")
 st.title("ToolFusion: Convert, Resize, Record & PDFs")
 
@@ -29,13 +26,13 @@ with col1:
     if uploaded_nb is not None:
         try:
             notebook = nbformat.read(uploaded_nb, as_version=4)
-            code_cells = [cell['source'] for cell in notebook.cells if cell['cell_type'] == 'code']
-            code_str = '\n\n'.join(code_cells)
+            code_cells = [cell["source"] for cell in notebook.cells if cell["cell_type"] == "code"]
+            code_str = "\n\n".join(code_cells)
             if not code_str.strip():
                 st.warning("No code cells found in the notebook!")
             else:
                 py_buffer = BytesIO()
-                py_buffer.write(code_str.encode('utf-8'))
+                py_buffer.write(code_str.encode("utf-8"))
                 py_buffer.seek(0)
                 fname = os.path.splitext(uploaded_nb.name)[0] + ".py"
                 st.success("Notebook converted successfully!")
@@ -106,7 +103,7 @@ with col3:
                 mime=f"image/{out_fmt.lower()}"
             )
 
-# Right of Second Row: PDF to DOCX Converter (Layout-Preserving)
+# Right of Second Row: PDF to DOCX Converter
 with col4:
     st.header("📄 PDF to DOCX Converter")
     uploaded_pdf = st.file_uploader(
@@ -139,7 +136,7 @@ with col4:
 st.markdown("---")
 col5, col6 = st.columns(2)
 
-# Third of Fourth Row: Merge PDFs
+# Merge PDFs
 with col5:
     st.header("🔗 Merge PDF Files")
     uploaded_pdfs = st.file_uploader(
@@ -166,12 +163,12 @@ with col5:
         except Exception as e:
             st.error(f"❌ Failed to merge PDFs: {e}")
 
-# Right of Fourth Row: Images to PDF
+# Images to PDF
 with col6:
     st.header("📷 Images to PDF Converter")
     uploaded_imgs = st.file_uploader(
         "Upload images to convert to PDF",
-        type=["png","jpg","jpeg","bmp","gif","tiff","webp"],
+        type=["png", "jpg", "jpeg", "bmp", "gif", "tiff", "webp"],
         accept_multiple_files=True,
         key="images_to_pdf"
     )
@@ -195,7 +192,6 @@ with col6:
         except Exception as e:
             st.error(f"❌ Failed to convert images to PDF: {e}")
 
-
 # --- Fourth Row: Screen Recorder ---
 st.markdown("---")
 st.header("📹 Screen Recorder")
@@ -212,32 +208,26 @@ components.html("""
     font-weight: bold;
     transition: background-color 0.3s ease;
   }
-
   #startBtn {
     background-color: #4CAF50;
     color: white;
   }
-
   #startBtn:hover {
     background-color: #45a049;
   }
-
   #stopBtn {
     background-color: #f44336;
     color: white;
   }
-
   #stopBtn:hover {
     background-color: #da190b;
   }
-
   #player {
     width: 100%;
     max-height: 300px;
     border-radius: 12px;
     margin-bottom: 10px;
   }
-
   a[download] {
     display: inline-block;
     margin-top: 15px;
@@ -248,7 +238,6 @@ components.html("""
     border-radius: 6px;
     font-weight: 600;
   }
-
   a[download]:hover {
     background: #0055aa;
   }
@@ -301,6 +290,37 @@ components.html("""
 </script>
 """, height=420)
 
+# --- Fifth Row: WebM to MP4 Converter ---
+st.markdown("---")
+st.header("🎬 WebM to MP4 Converter")
 
- 
- 
+uploaded_webm = st.file_uploader(
+    "Upload a WebM video to convert to MP4",
+    type=["webm"],
+    key="webm_uploader"
+)
+
+if uploaded_webm:
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".webm") as tmp:
+        tmp.write(uploaded_webm.read())
+        webm_path = tmp.name
+    try:
+        clip = mp.VideoFileClip(
+            webm_path,
+            ffmpeg_params=["-probesize", "100M", "-analyzeduration", "100M"]
+        )
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmp2:
+            mp4_path = tmp2.name
+        clip.write_videofile(mp4_path, codec="libx264", audio_codec="aac")
+        clip.close()
+        with open(mp4_path, "rb") as f:
+            mp4_bytes = f.read()
+        out_name = os.path.splitext(uploaded_webm.name)[0] + ".mp4"
+        st.download_button(
+            label="📥 Download MP4",
+            data=mp4_bytes,
+            file_name=out_name,
+            mime="video/mp4"
+        )
+    except Exception as e:
+        st.error(f"❌ Conversion failed: {e}")
