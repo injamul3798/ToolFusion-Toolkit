@@ -23,3 +23,14 @@
 7. **Images to PDF**: Convert a batch of images into one consolidated PDF using Pillow.
 
 ---
+
+## 🤝 Contributing
+Contributions are welcome! Feel free to open issues or submit pull requests for new features or bug fixes.
+
+ 
+
+## 📄 Made with ❤️ by Md. Injamul Haque, Software Engineer (AI/ML)
+
+ 
+
+ 
