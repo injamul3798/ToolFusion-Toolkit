@@ -5,3 +5,4 @@ PyPDF2
 python-docx
 pdf2docx
 pillow
+moviepy
