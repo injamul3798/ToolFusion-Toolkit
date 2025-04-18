@@ -193,41 +193,41 @@ with col6:
             st.error(f"❌ Failed to convert images to PDF: {e}")
 # --- Four Row: WebM to MP4 Converter ---
  
-st.markdown("---")
-st.header("🎬 WebM to MP4 Converter")
+# st.markdown("---")
+# st.header("🎬 WebM to MP4 Converter")
 
-uploaded_webm = st.file_uploader(
-    "Upload a WebM video to convert to MP4",
-    type=["webm"],
-    key="webm_uploader"
-)
+# uploaded_webm = st.file_uploader(
+#     "Upload a WebM video to convert to MP4",
+#     type=["webm"],
+#     key="webm_uploader"
+# )
 
-if uploaded_webm:
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".webm") as tmp:
-        tmp.write(uploaded_webm.read())
-        webm_path = tmp.name
-    try:
-        clip = mp.VideoFileClip(webm_path)
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmp2:
-            mp4_path = tmp2.name
-        clip.write_videofile(
-            mp4_path,
-            codec="libx264",
-            audio_codec="aac",
-            ffmpeg_params=["-probesize", "100M", "-analyzeduration", "100M"]
-        )
-        clip.close()
-        with open(mp4_path, "rb") as f:
-            mp4_bytes = f.read()
-        out_name = os.path.splitext(uploaded_webm.name)[0] + ".mp4"
-        st.download_button(
-            label="📥 Download MP4",
-            data=mp4_bytes,
-            file_name=out_name,
-            mime="video/mp4"
-        )
-    except Exception as e:
-        st.error(f"❌ Conversion failed: {e}")
+# if uploaded_webm:
+#     with tempfile.NamedTemporaryFile(delete=False, suffix=".webm") as tmp:
+#         tmp.write(uploaded_webm.read())
+#         webm_path = tmp.name
+#     try:
+#         clip = mp.VideoFileClip(webm_path)
+#         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmp2:
+#             mp4_path = tmp2.name
+#         clip.write_videofile(
+#             mp4_path,
+#             codec="libx264",
+#             audio_codec="aac",
+#             ffmpeg_params=["-probesize", "100M", "-analyzeduration", "100M"]
+#         )
+#         clip.close()
+#         with open(mp4_path, "rb") as f:
+#             mp4_bytes = f.read()
+#         out_name = os.path.splitext(uploaded_webm.name)[0] + ".mp4"
+#         st.download_button(
+#             label="📥 Download MP4",
+#             data=mp4_bytes,
+#             file_name=out_name,
+#             mime="video/mp4"
+#         )
+#     except Exception as e:
+#         st.error(f"❌ Conversion failed: {e}")
 
 # --- 5th Row: Screen Recorder ---
 st.markdown("---")
